@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             graph = new OxyPlot.WindowsForms.PlotView();
-            addButton = new Button();
             containerLineEq = new Panel();
             toggleLineEq = new Button();
             SuspendLayout();
@@ -45,16 +44,6 @@
             graph.ZoomHorizontalCursor = Cursors.SizeWE;
             graph.ZoomRectangleCursor = Cursors.SizeNWSE;
             graph.ZoomVerticalCursor = Cursors.SizeNS;
-            // 
-            // addButton
-            // 
-            addButton.Location = new Point(363, 415);
-            addButton.Name = "addButton";
-            addButton.Size = new Size(75, 23);
-            addButton.TabIndex = 1;
-            addButton.Text = "Add New";
-            addButton.UseVisualStyleBackColor = true;
-            addButton.Click += addButton_Click;
             // 
             // containerLineEq
             // 
@@ -79,7 +68,6 @@
             ClientSize = new Size(800, 450);
             Controls.Add(toggleLineEq);
             Controls.Add(containerLineEq);
-            Controls.Add(addButton);
             Controls.Add(graph);
             Name = "Form1";
             Text = "Graphing Calculator";
@@ -89,7 +77,6 @@
         #endregion
 
         private OxyPlot.WindowsForms.PlotView graph;
-        private Button addButton;
         private Panel containerLineEq;
         private Button toggleLineEq;
     }

@@ -5,16 +5,21 @@ using NCalc;
 
 namespace Graphing_Calculator_GUI
 {
+    // bug where the y and x are intechangeable
+
     public partial class Form1 : Form
     {
         private List<ComboBox> comboBoxes = new List<ComboBox>();
         private List<TextBox> inputFields = new List<TextBox>();
         private List<Button> displayButtons = new List<Button>();
+        private List<Button> removeButtons = new List<Button>(); // List to hold remove buttons
         private PlotModel plotModel = new PlotModel { Title = "Graph" };
 
         private System.Windows.Forms.Timer timer;
         private bool isSidebarVisible;
         private int sidebarWidth;
+
+        private Panel scrollablePanel; // Scrollable container
 
         public Form1()
         {
@@ -50,6 +55,47 @@ namespace Graphing_Calculator_GUI
             plotModel.Axes.Add(yAxis);
         }
 
+        private void InitializeSidebar()
+        {
+            sidebarWidth = 400; // Set the desired width of the sidebar
+            isSidebarVisible = false;
+
+            // Initialize the Timer
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 10; // Set the interval for the timer
+            timer.Tick += Timer_Tick;
+
+            // Set initial sidebar properties
+            containerLineEq.Width = 0;
+            containerLineEq.Visible = true;
+
+            // Create scrollable container
+            scrollablePanel = new Panel
+            {
+                AutoScroll = true,
+                Width = sidebarWidth - 20,
+                Height = containerLineEq.Height - 50,
+                Location = new Point(0, 50),
+            };
+            containerLineEq.Controls.Add(scrollablePanel);
+
+            toggleLineEq.Click += ToggleLineEq_Click;
+
+            toggleLineEq.Size = new Size(30, 100);
+            toggleLineEq.Location = new Point(containerLineEq.Width, 0);
+            toggleLineEq.FlatAppearance.BorderSize = 0;
+
+            // Add addButton inside the sidebar but outside the scrollable container
+            Button addButton = new Button
+            {
+                Text = "Add",
+                Width = 70,
+                Location = new Point(10, 10),
+            };
+            addButton.Click += addButton_Click;
+            containerLineEq.Controls.Add(addButton);
+        }
+
         private void addButton_Click(object sender, EventArgs e)
         {
             // Create new ComboBox
@@ -59,20 +105,49 @@ namespace Graphing_Calculator_GUI
             comboBox.SelectedIndex = 0;
             comboBox.Width = 70;
             comboBoxes.Add(comboBox);
-            containerLineEq.Controls.Add(comboBox);  
 
             // Create new TextBox
             TextBox inputField = new TextBox();
-            inputField.Width = 200;
+            inputField.Width = 160;
             inputFields.Add(inputField);
-            containerLineEq.Controls.Add(inputField);  
 
             // Create new Display Button
             Button displayButton = new Button();
             displayButton.Text = "Display";
             displayButton.Click += (s, ev) => ToggleDisplayFunction(comboBox, inputField, displayButton);
+            displayButton.Width = 70;
             displayButtons.Add(displayButton);
-            containerLineEq.Controls.Add(displayButton);  
+
+            // Create new Remove Button
+            Button removeButton = new Button();
+            removeButton.Text = "X";
+            removeButton.Click += (s, ev) => RemoveControls(comboBox, inputField, displayButton, removeButton);
+            removeButton.Width = 30;
+            removeButtons.Add(removeButton);
+
+            // Add controls to scrollablePanel
+            scrollablePanel.Controls.Add(comboBox);
+            scrollablePanel.Controls.Add(inputField);
+            scrollablePanel.Controls.Add(displayButton);
+            scrollablePanel.Controls.Add(removeButton);
+
+            LayoutControls();
+        }
+
+        private void RemoveControls(ComboBox comboBox, TextBox inputField, Button displayButton, Button removeButton)
+        {
+            ToggleDisplayFunction(comboBox, inputField, displayButton);
+
+            // Remove controls from panel and lists
+            scrollablePanel.Controls.Remove(comboBox);
+            scrollablePanel.Controls.Remove(inputField);
+            scrollablePanel.Controls.Remove(displayButton);
+            scrollablePanel.Controls.Remove(removeButton);
+
+            comboBoxes.Remove(comboBox);
+            inputFields.Remove(inputField);
+            displayButtons.Remove(displayButton);
+            removeButtons.Remove(removeButton);
 
             LayoutControls();
         }
@@ -84,7 +159,8 @@ namespace Graphing_Calculator_GUI
             {
                 comboBoxes[i].Location = new System.Drawing.Point(10, yOffset);
                 inputFields[i].Location = new System.Drawing.Point(90, yOffset);
-                displayButtons[i].Location = new System.Drawing.Point(300, yOffset);
+                displayButtons[i].Location = new System.Drawing.Point(260, yOffset);
+                removeButtons[i].Location = new System.Drawing.Point(340, yOffset);
                 yOffset += 30;
             }
         }
@@ -154,27 +230,6 @@ namespace Graphing_Calculator_GUI
             var result = expression.Evaluate();
 
             return Convert.ToDouble(result);
-        }
-
-        private void InitializeSidebar()
-        {
-            sidebarWidth = 400; // Set the desired width of the sidebar
-            isSidebarVisible = false;
-
-            // Initialize the Timer
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 10; // Set the interval for the timer
-            timer.Tick += Timer_Tick;
-
-            // Set initial sidebar properties
-            containerLineEq.Width = 0;
-            containerLineEq.Visible = true;
-
-            toggleLineEq.Click += ToggleLineEq_Click;
-
-            toggleLineEq.Size = new Size(30, 100);
-            toggleLineEq.Location = new Point(containerLineEq.Width, 0);
-            toggleLineEq.FlatAppearance.BorderSize = 0;
         }
 
         private void ToggleLineEq_Click(object sender, EventArgs e)
