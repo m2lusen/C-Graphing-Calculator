@@ -1,0 +1,21 @@
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\Graphing Calculator GUI.exe
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\Graphing Calculator GUI.deps.json
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\Graphing Calculator GUI.runtimeconfig.json
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\Graphing Calculator GUI.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\Graphing Calculator GUI.pdb
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\OxyPlot.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\OxyPlot.WindowsForms.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.csproj.AssemblyReference.cache
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing_Calculator_GUI.Form1.resources
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.csproj.GenerateResource.cache
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.AssemblyInfoInputs.cache
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.AssemblyInfo.cs
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.csproj.CoreCompileInputs.cache
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing.FD032F5A.Up2Date
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\refint\Graphing Calculator GUI.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.pdb
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\Graphing Calculator GUI.genruntimeconfig.cache
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\obj\Debug\net6.0-windows\ref\Graphing Calculator GUI.dll
+C:\Users\m2lus\source\repos\Graphing Calculator GUI\Graphing Calculator GUI\bin\Debug\net6.0-windows\NCalc.dll
