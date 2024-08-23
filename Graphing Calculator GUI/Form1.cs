@@ -2,17 +2,30 @@ using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 using NCalc;
+using System.IO;
 
 namespace Graphing_Calculator_GUI
 {
-    // bug where the y and x are intechangeable
-
     public partial class Form1 : Form
     {
-        private List<ComboBox> comboBoxes = new List<ComboBox>();
-        private List<TextBox> inputFields = new List<TextBox>();
-        private List<Button> displayButtons = new List<Button>();
-        private List<Button> removeButtons = new List<Button>(); // List to hold remove buttons
+        private class LineInfo
+        {
+            public Guid ID { get; set; }
+            public ComboBox ComboBox { get; set; }
+            public TextBox InputField { get; set; }
+            public Button DisplayButton { get; set; }
+            public Button RemoveButton { get; set; }
+            public LineSeries Line { get; set; }
+            public bool IsHidden { get; set; }
+
+            public LineInfo()
+            {
+                ID = Guid.NewGuid();
+                IsHidden = false;
+            }
+        }
+
+        private List<LineInfo> lineInfos = new List<LineInfo>();
         private PlotModel plotModel = new PlotModel { Title = "Graph" };
 
         private System.Windows.Forms.Timer timer;
@@ -98,56 +111,70 @@ namespace Graphing_Calculator_GUI
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            // Create new ComboBox
-            ComboBox comboBox = new ComboBox();
-            comboBox.Items.Add("y = f(x)");
-            comboBox.Items.Add("x = f(y)");
-            comboBox.SelectedIndex = 0;
-            comboBox.Width = 70;
-            comboBoxes.Add(comboBox);
+            // Create a new LineInfo instance
+            LineInfo lineInfo = new LineInfo();
 
-            // Create new TextBox
-            TextBox inputField = new TextBox();
-            inputField.Width = 160;
-            inputFields.Add(inputField);
+            // Initialize ComboBox
+            lineInfo.ComboBox = new ComboBox
+            {
+                Items = { "y = f(x)", "x = f(y)" },
+                SelectedIndex = 0,
+                Width = 70
+            };
+            lineInfo.ComboBox.SelectedIndexChanged += (s, ev) => EquationChanged(lineInfo);
 
-            // Create new Display Button
-            Button displayButton = new Button();
-            displayButton.Text = "Display";
-            displayButton.Click += (s, ev) => ToggleDisplayFunction(comboBox, inputField, displayButton);
-            displayButton.Width = 70;
-            displayButtons.Add(displayButton);
+            // Initialize TextBox
+            lineInfo.InputField = new TextBox
+            {
+                Width = 160
+            };
+            lineInfo.InputField.TextChanged += (s, ev) => EquationChanged(lineInfo);
 
-            // Create new Remove Button
-            Button removeButton = new Button();
-            removeButton.Text = "X";
-            removeButton.Click += (s, ev) => RemoveControls(comboBox, inputField, displayButton, removeButton);
-            removeButton.Width = 30;
-            removeButtons.Add(removeButton);
+            // Initialize Display Button
+            lineInfo.DisplayButton = new Button
+            {
+                Text = "Display",
+                Width = 70
+            };
+            lineInfo.DisplayButton.Click += (s, ev) => ToggleDisplayFunction(lineInfo);
 
-            // Add controls to scrollablePanel
-            scrollablePanel.Controls.Add(comboBox);
-            scrollablePanel.Controls.Add(inputField);
-            scrollablePanel.Controls.Add(displayButton);
-            scrollablePanel.Controls.Add(removeButton);
+            // Initialize Remove Button
+            lineInfo.RemoveButton = new Button
+            {
+                Text = "X",
+                Width = 30
+            };
+            lineInfo.RemoveButton.Click += (s, ev) => RemoveControls(lineInfo);
+
+            // Add controls to the scrollablePanel
+            scrollablePanel.Controls.Add(lineInfo.ComboBox);
+            scrollablePanel.Controls.Add(lineInfo.InputField);
+            scrollablePanel.Controls.Add(lineInfo.DisplayButton);
+            scrollablePanel.Controls.Add(lineInfo.RemoveButton);
+
+            // Add to the list
+            lineInfos.Add(lineInfo);
 
             LayoutControls();
         }
 
-        private void RemoveControls(ComboBox comboBox, TextBox inputField, Button displayButton, Button removeButton)
+        private void RemoveControls(LineInfo lineInfo)
         {
-            ToggleDisplayFunction(comboBox, inputField, displayButton);
+            // If the line is visible, remove it from the plot
+            if (lineInfo.Line != null && !lineInfo.IsHidden)
+            {
+                plotModel.Series.Remove(lineInfo.Line);
+                plotModel.InvalidatePlot(true);
+            }
 
-            // Remove controls from panel and lists
-            scrollablePanel.Controls.Remove(comboBox);
-            scrollablePanel.Controls.Remove(inputField);
-            scrollablePanel.Controls.Remove(displayButton);
-            scrollablePanel.Controls.Remove(removeButton);
+            // Remove controls from panel
+            scrollablePanel.Controls.Remove(lineInfo.ComboBox);
+            scrollablePanel.Controls.Remove(lineInfo.InputField);
+            scrollablePanel.Controls.Remove(lineInfo.DisplayButton);
+            scrollablePanel.Controls.Remove(lineInfo.RemoveButton);
 
-            comboBoxes.Remove(comboBox);
-            inputFields.Remove(inputField);
-            displayButtons.Remove(displayButton);
-            removeButtons.Remove(removeButton);
+            // Remove from the list
+            lineInfos.Remove(lineInfo);
 
             LayoutControls();
         }
@@ -155,43 +182,47 @@ namespace Graphing_Calculator_GUI
         private void LayoutControls()
         {
             int yOffset = 10;
-            for (int i = 0; i < comboBoxes.Count; i++)
+            foreach (var lineInfo in lineInfos)
             {
-                comboBoxes[i].Location = new System.Drawing.Point(10, yOffset);
-                inputFields[i].Location = new System.Drawing.Point(90, yOffset);
-                displayButtons[i].Location = new System.Drawing.Point(260, yOffset);
-                removeButtons[i].Location = new System.Drawing.Point(340, yOffset);
+                lineInfo.ComboBox.Location = new Point(10, yOffset);
+                lineInfo.InputField.Location = new Point(90, yOffset);
+                lineInfo.DisplayButton.Location = new Point(260, yOffset);
+                lineInfo.RemoveButton.Location = new Point(340, yOffset);
                 yOffset += 30;
             }
         }
 
-        private void ToggleDisplayFunction(ComboBox comboBox, TextBox inputField, Button displayButton)
+        private void ToggleDisplayFunction(LineInfo lineInfo)
         {
-            string seriesTitle = $"{comboBox.SelectedItem} - {inputField.Text}";
-            var existingSeries = plotModel.Series.FirstOrDefault(series => series.Title == seriesTitle) as LineSeries;
-
-            if (existingSeries != null)
+            if (lineInfo.Line != null)
             {
                 // Toggle visibility
-                existingSeries.IsVisible = !existingSeries.IsVisible;
-                plotModel.InvalidatePlot(true);
+                lineInfo.Line.IsVisible = !lineInfo.Line.IsVisible;
+                lineInfo.IsHidden = !lineInfo.Line.IsVisible;
 
-                // Update button text based on the visibility status
-                displayButton.Text = existingSeries.IsVisible ? "Hide" : "Display";
+                plotModel.InvalidatePlot(true);
+                lineInfo.DisplayButton.Text = lineInfo.Line.IsVisible ? "Hide" : "Display";
             }
             else
             {
-                // Create and display a new series
-                DisplayFunction(comboBox, inputField, seriesTitle);
-                displayButton.Text = "Hide";
+                try
+                {
+                    // Create and display a new series
+                    DisplayFunction(lineInfo);
+                    lineInfo.DisplayButton.Text = "Hide";
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
-        private void DisplayFunction(ComboBox comboBox, TextBox inputField, string seriesTitle)
+        private void DisplayFunction(LineInfo lineInfo)
         {
-            string function = inputField.Text;
-            string graphType = comboBox.SelectedItem.ToString();
-            var series = new LineSeries { Title = seriesTitle };
+            string function = lineInfo.InputField.Text;
+            string graphType = lineInfo.ComboBox.SelectedItem.ToString();
+            var series = new LineSeries { Title = $"{lineInfo.ID}" };
 
             try
             {
@@ -199,7 +230,7 @@ namespace Graphing_Calculator_GUI
                 {
                     for (double x = -10; x <= 10; x += 0.1)
                     {
-                        double y = EvaluateExpression(function, x);
+                        double y = EvaluateExpression(function, x, "x");
                         series.Points.Add(new DataPoint(x, y));
                     }
                 }
@@ -207,29 +238,58 @@ namespace Graphing_Calculator_GUI
                 {
                     for (double y = -10; y <= 10; y += 0.1)
                     {
-                        double x = EvaluateExpression(function, y);
+                        double x = EvaluateExpression(function, y, "y");
                         series.Points.Add(new DataPoint(x, y));
                     }
                 }
 
                 plotModel.Series.Add(series);
                 plotModel.InvalidatePlot(true);
+
+                lineInfo.Line = series;
+                lineInfo.IsHidden = false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error in function evaluation: " + ex.Message);
+                throw new InvalidOperationException("Error in function evaluation: " + ex.Message, ex);
             }
         }
 
-        private double EvaluateExpression(string function, double variable)
+        private double EvaluateExpression(string function, double variable, string variableName)
         {
-            function = function.Replace("x", variable.ToString());
-            function = function.Replace("y", variable.ToString());
+            // Replace only the specified variable
+            function = ReplaceVariable(function, variable, variableName);
 
             var expression = new Expression(function);
             var result = expression.Evaluate();
 
             return Convert.ToDouble(result);
+        }
+
+        private string ReplaceVariable(string expression, double value, string variableName)
+        {
+            // Replace only standalone instances of the variable
+            // To avoid replacing substrings, use a regex
+            return System.Text.RegularExpressions.Regex.Replace(
+                expression,
+                $@"\b{variableName}\b",
+                value.ToString(),
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private void EquationChanged(LineInfo lineInfo)
+        {
+            // Remove the existing line if it exists
+            if (lineInfo.Line != null)
+            {
+                plotModel.Series.Remove(lineInfo.Line);
+                lineInfo.Line = null;
+                lineInfo.IsHidden = true;
+                plotModel.InvalidatePlot(true);
+            }
+
+            // Reset the display button text to "Display"
+            lineInfo.DisplayButton.Text = "Display";
         }
 
         private void ToggleLineEq_Click(object sender, EventArgs e)
